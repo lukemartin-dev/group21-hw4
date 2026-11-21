@@ -16,9 +16,14 @@ class Bowling_Frame
 		int frame_num_;
 		int frame_score_;
 
+		int bonus_roll1_;
+		int bonus_roll2_;
+		int bonus_count_;
+
 		Bowling_Frame * next_frame_;
 		Bowling_Frame * prev_frame_;
 
+		void recalculate_scores();
 
 	public:
 		Bowling_Frame(int fnum);
