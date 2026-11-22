@@ -45,6 +45,9 @@ class Bowling_Frame
 		void spare(bool value);
 		int frame_num();
 		int frame_score();
+		int bonus_roll1();
+		int bonus_roll2();
+		int bonus_count();
 		void update_scores();
 };
 

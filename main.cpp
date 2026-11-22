@@ -86,8 +86,10 @@ int main(int argc, char * argv[])
 			 	 << " Score 1: " << traverse->score1() << endl
 			 	 << " Score 2: " << traverse->score2() << endl;
 
-			if (traverse->frame_num() == 10 && (traverse->strike() || traverse->spare()))
-				cout << " Score 3: " << traverse->score3() << endl;
+			if (traverse->bonus_count() >= 1)
+				cout << " Bonus Roll 1: " << traverse->bonus_roll1() << endl;
+			if (traverse->bonus_count() >= 2)
+				cout << " Bonus Roll 2: " << traverse->bonus_roll2() << endl;
 
 			cout << " Frame Score: " << traverse->frame_score() << endl;
 

@@ -67,6 +67,9 @@ void Bowling_Frame::spare(bool value) {
 
 int Bowling_Frame::frame_num() { return frame_num_; }
 int Bowling_Frame::frame_score() { return frame_score_; }
+int Bowling_Frame::bonus_roll1() { return bonus_roll1_; }
+int Bowling_Frame::bonus_roll2() { return bonus_roll2_; }
+int Bowling_Frame::bonus_count() { return bonus_count_; }
 
 void Bowling_Frame::recalculate_scores() {
     Bowling_Frame* first = this;
