@@ -1,6 +1,7 @@
 #include <iostream>
 #include "bowling_frame.h"
 #include <random>
+#include <string>
 
 using namespace std;
 
@@ -20,58 +21,94 @@ int current_game_total(Bowling_Frame * first_frame)
 	return game_total;	
 }
 
-int main()
+int main(int argc, char * argv[])
 {
-	//make frames
-	Bowling_Frame * f1 = new Bowling_Frame(1);
-	Bowling_Frame * f2 = new Bowling_Frame(2);
-	Bowling_Frame * f3 = new Bowling_Frame(3);
+	//check for the number of players argument
+	if (argc != 2)
+	{
+		cout << "Usage: " << argv[0] << " <num_players>" << endl;
+		return 1;
+	}
 
-	//link frames together
-	f1->next_frame(f2);
+	string arg = argv[1];
+	for (unsigned int i = 0; i < arg.length(); i++)
+	{
+		if (arg[i] < '0' || arg[i] > '9')
+		{
+			cout << "Error: number of players must be a positive integer." << endl;
+			cout << "Usage: " << argv[0] << " <num_players>" << endl;
+			return 1;
+		}
+	}
 
-	f2->next_frame(f3);
-	f2->prev_frame(f1);
+	int num_players = stoi(arg);
+	if (num_players < 1)
+	{
+		cout << "Error: number of players must be at least 1." << endl;
+		return 1;
+	}
 
-	f3->prev_frame(f2);	
+	cout << "Player count is: " << num_players << endl;
 
-	//set frame scores	
-	f1->update_scores();
-	f1->update_scores();
-	cout << "Frame 1 Total: " << current_game_total(f1) << endl;
+	//make an array with one Bowling_Frame pointer per player
+	Bowling_Frame ** players = new Bowling_Frame*[num_players];
 
-	f1->update_scores();
-	f1->update_scores();
-	cout << "Frame 1 and 2 Total: " << current_game_total(f1) << endl;
+	//make frames and link frames together
+	for (int p = 0; p < num_players; p++)
+	{
+		players[p] = new Bowling_Frame(1);
+		Bowling_Frame * prev = players[p];
 
+		for (int f = 2; f <= 10; f++)
+		{
+			Bowling_Frame * frame = new Bowling_Frame(f);
+			prev->next_frame(frame);
+			frame->prev_frame(prev);
+			prev = frame;
+		}
+	}
 
-	f1->update_scores();
-	f1->update_scores();
-	cout << "Frame 1,2,and 3 Total: " << current_game_total(f1) << endl;
-
-	//print values
-	cout << "Frame " << f1->frame_num() << ": " << endl
-		 << " Score 1: " << f1->score1() << endl
-		 << " Score 2: " << f1->score2() << endl;
-
-	cout << "Frame " << f2->frame_num() << ": " << endl
-	     << " Score 1: " << f2->score1() << endl
-		 << " Score 2: " << f2->score2() << endl;
-
-	cout << "Frame " << f3->frame_num() << ": " << endl
-	     << " Score 1: " << f3->score1() << endl
-		 << " Score 2: " << f3->score2() << endl;
+	//set frame scores: each call is one roll, and a game has at most 21 rolls
+	for (int p = 0; p < num_players; p++)
+	{
+		for (int r = 0; r < 21; r++)
+			players[p]->update_scores();
+	}
 
 	//iterate through linked list and print values
-	Bowling_Frame * traverse = f1;
-	
-	while(traverse)
+	for (int p = 0; p < num_players; p++)
 	{
-		cout << "Frame " << traverse->frame_num() << ": " << endl
-		 	 << " Score 1: " << traverse->score1() << endl
-		 	 << " Score 2: " << traverse->score2() << endl;
+		Bowling_Frame * traverse = players[p];
+		
+		while(traverse)
+		{
+			cout << "Frame " << traverse->frame_num() << ": " << endl
+			 	 << " Score 1: " << traverse->score1() << endl
+			 	 << " Score 2: " << traverse->score2() << endl;
 
-		traverse = traverse->next_frame();
+			if (traverse->frame_num() == 10 && (traverse->strike() || traverse->spare()))
+				cout << " Score 3: " << traverse->score3() << endl;
+
+			cout << " Frame Score: " << traverse->frame_score() << endl;
+
+			traverse = traverse->next_frame();
+		}
+
+		cout << endl << "Total Game Score for player " << p + 1 << ": "
+			 << current_game_total(players[p]) << endl << endl;
 	}
+
+	//delete frames
+	for (int p = 0; p < num_players; p++)
+	{
+		Bowling_Frame * temp = players[p];
+		while (temp)
+		{
+			Bowling_Frame * next = temp->next_frame();
+			delete temp;
+			temp = next;
+		}
+	}
+	delete [] players;
 
 }
